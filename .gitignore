@@ -1,0 +1,80 @@
+# ===============================
+# ARCHIVO: .gitignore
+# Proyecto: Citas Médicas Locales
+# Descripción: Ignora archivos y carpetas innecesarias
+# ===============================
+
+# --- Archivos y carpetas del sistema ---
+.DS_Store
+Thumbs.db
+
+# --- Configuraciones locales de IDE ---
+.idea/
+.vscode/
+*.iml
+
+# --- Flutter / Dart ---
+# Carpetas generadas automáticamente
+build/
+.flutter-plugins
+.flutter-plugins-deps
+.packages
+.pub-cache/
+.dart_tool/
+.generated/
+coverage/
+ios/Flutter/App.framework
+android/.gradle/
+android/local.properties
+
+# --- Node.js / JavaScript ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+.env
+.env.local
+.env.production
+
+# --- Python / FastAPI ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+venv/
+ENV/
+env/
+.mypy_cache/
+.pytest_cache/
+Pipfile.lock
+
+# --- Logs y temporales ---
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+*.swp
+
+# --- Archivos de compilación y empaquetado ---
+*.apk
+*.aab
+*.ipa
+*.class
+*.exe
+*.dll
+*.zip
+*.tar
+*.gz
+
+# --- Archivos del sistema operativo ---
+ehthumbs.db
+Icon?
+desktop.ini
+
+# --- Otros ---
+coverage/
+.cache/
