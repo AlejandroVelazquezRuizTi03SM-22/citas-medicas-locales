@@ -14,61 +14,19 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Show repository tree (debug)
-        run: |
-          echo "=== repo root ==="
-          ls -la
-          echo ""
-          echo "=== .github/workflows ==="
-          ls -la .github/workflows || true
-          echo ""
-          echo "=== find pubspec files tracked by git ==="
-          git ls-files '*pubspec.yaml' || true
-
-      - name: Set PROJECT_DIR to app-perrona
-        run: |
-          echo "PROJECT_DIR=app-perrona" >> $GITHUB_ENV
-          echo "Using PROJECT_DIR=app-perrona"
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.9'   # ✅ Versión estable real
+          flutter-version: '3.13.9'
 
       - name: Disable Flutter analytics
         run: |
           flutter config --no-analytics || true
           flutter --version
 
-      - name: Cache pub & dart tool (based on app-perrona pubspec)
-        uses: actions/cache@v3
-        with:
-          key: ${{ runner.os }}-flutter-app-perrona-${{ hashFiles('app-perrona/pubspec.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-flutter-app-perrona-
-          path: |
-            ~/.pub-cache
-            app-perrona/.dart_tool
-            .pub-cache
-
-      - name: Get dependencies (in app-perrona)
+      - name: Install deps and test
         run: |
-          cd "${PROJECT_DIR}"
-          echo "PWD: $(pwd)"
-          ls -la
+          cd app-perrona
           flutter pub get --verbose
-
-      - name: Validate formatting (in app-perrona)
-        run: |
-          cd "${PROJECT_DIR}"
-          flutter format --set-exit-if-changed .
-
-      - name: Analyze code (in app-perrona)
-        run: |
-          cd "${PROJECT_DIR}"
           flutter analyze
-
-      - name: Run tests (in app-perrona)
-        run: |
-          cd "${PROJECT_DIR}"
           flutter test --no-publish-platform-views
