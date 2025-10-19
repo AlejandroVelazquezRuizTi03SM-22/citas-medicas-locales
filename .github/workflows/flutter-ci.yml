@@ -8,6 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    defaults:
+      run:
+        working-directory: app  
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -15,10 +19,26 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.0'  # Versión estable conocida
+          flutter-version: '3.13.0'  
+
+      - name: Disable Flutter analytics
+        run: flutter config --no-analytics
+
+      - name: Cache Flutter packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            app/.dart_tool  
+          key: ${{ runner.os }}-flutter-${{ hashFiles('app/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
 
       - name: Get dependencies
         run: flutter pub get
+
+      - name: Validate formatting
+        run: flutter format --set-exit-if-changed .
 
       - name: Analyze code
         run: flutter analyze
