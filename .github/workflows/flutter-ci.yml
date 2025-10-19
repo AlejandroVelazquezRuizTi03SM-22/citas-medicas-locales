@@ -1,4 +1,4 @@
-name: Flutter CI (app-perrona)
+name: Flutter CI
 
 on:
   pull_request:
@@ -8,25 +8,40 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repo (full)
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+    defaults:
+      run:
+        working-directory: app  # ← Cambia esto si tu proyecto Flutter está en otra carpeta
 
-      - name: Setup Flutter
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.13.9'
+          flutter-version: '3.13.0'  # Versión estable conocida
 
       - name: Disable Flutter analytics
-        run: |
-          flutter config --no-analytics || true
-          flutter --version
+        run: flutter config --no-analytics
 
-      - name: Install deps and test
-        run: |
-          cd app-perrona
-          flutter pub get --verbose
-          flutter analyze
-          flutter test --no-publish-platform-views
+      - name: Cache Flutter packages
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.pub-cache
+            app/.dart_tool  # ← Ajusta si tu carpeta no se llama "app"
+          key: ${{ runner.os }}-flutter-${{ hashFiles('app/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Validate formatting
+        run: flutter format --set-exit-if-changed .
+
+      - name: Analyze code
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
