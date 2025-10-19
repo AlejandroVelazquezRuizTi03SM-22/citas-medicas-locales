@@ -1,4 +1,4 @@
-name: Flutter CI (auto-detect project)
+name: Flutter CI (app-perrona)
 
 on:
   pull_request:
@@ -9,34 +9,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repo (full)
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Show repo tree (debug)
+      - name: Show repository tree (debug)
         run: |
-          echo "=== repo root files ==="
+          echo "=== repo root ==="
           ls -la
           echo ""
-          echo "=== git tracked pubspec.yaml files ==="
+          echo "=== .github/workflows ==="
+          ls -la .github/workflows || true
+          echo ""
+          echo "=== find pubspec files tracked by git ==="
           git ls-files '*pubspec.yaml' || true
 
-      - name: Detect Flutter project directory
-        id: detect
+      - name: Set PROJECT_DIR to app-perrona
         run: |
-          # Find first tracked pubspec.yaml (prefer tracked files)
-          PUBSPEC=$(git ls-files '*pubspec.yaml' | head -n 1 || true)
-          if [ -z "$PUBSPEC" ]; then
-            echo "No pubspec.yaml found in repo. Failing early."
-            exit 1
-          fi
-          PROJ_DIR=$(dirname "$PUBSPEC")
-          echo "Found pubspec at: $PUBSPEC"
-          echo "PROJECT_DIR=$PROJ_DIR" >> $GITHUB_ENV
-          echo "::set-output name=project_dir::$PROJ_DIR"
+          # Hardcode project dir known from your repo layout
+          echo "PROJECT_DIR=app-perrona" >> $GITHUB_ENV
+          echo "Using PROJECT_DIR=app-perrona"
 
-      - name: Set up Flutter
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: 'stable'
@@ -46,37 +41,37 @@ jobs:
           flutter config --no-analytics || true
           flutter --version
 
-      - name: Cache pub & dart tool
+      - name: Cache pub & dart tool (based on app-perrona pubspec)
         uses: actions/cache@v3
         with:
-          # Cache based on all pubspec.yaml files in the repo (works for subfolders)
-          key: ${{ runner.os }}-flutter-${{ hashFiles('**/pubspec.yaml') }}
+          key: ${{ runner.os }}-flutter-app-perrona-${{ hashFiles('app-perrona/pubspec.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-flutter-
+            ${{ runner.os }}-flutter-app-perrona-
           path: |
             ~/.pub-cache
+            app-perrona/.dart_tool
             .pub-cache
-            **/.dart_tool
 
-      - name: Get dependencies (in project dir)
+      - name: Get dependencies (in app-perrona)
         run: |
           echo "PROJECT_DIR=${PROJECT_DIR}"
           cd "${PROJECT_DIR}"
-          flutter pub get
-        env:
-          PUB_CACHE: ${{ runner.tool_cache }}/pub-cache
+          echo "PWD: $(pwd)"
+          echo "Listing files here:"
+          ls -la
+          flutter pub get --verbose
 
-      - name: Validate formatting (in project dir)
+      - name: Validate formatting (in app-perrona)
         run: |
           cd "${PROJECT_DIR}"
           flutter format --set-exit-if-changed .
 
-      - name: Analyze code (in project dir)
+      - name: Analyze code (in app-perrona)
         run: |
           cd "${PROJECT_DIR}"
           flutter analyze
 
-      - name: Run tests (in project dir)
+      - name: Run tests (in app-perrona)
         run: |
           cd "${PROJECT_DIR}"
           flutter test --no-publish-platform-views
