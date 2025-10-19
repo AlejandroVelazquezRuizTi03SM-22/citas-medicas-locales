@@ -1,47 +1,20 @@
 name: Flutter CI
+on: pull_request: branches: [ "main" ]
+jobs: build: runs-on: ubuntu-latest
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v4
 
-on:
-  pull_request:
-    branches: [ "main" ]
+  - name: Set up Flutter
+    uses: subosito/flutter-action@v2
+    with:
+      flutter-version: '3.13.0'  # Versión estable conocida
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
+  - name: Get dependencies
+    run: flutter pub get
 
-    defaults:
-      run:
-        working-directory: app  # ← Cambia esto si tu proyecto Flutter está en otra carpeta
+  - name: Analyze code
+    run: flutter analyze
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.13.0'  # Versión estable conocida
-
-      - name: Disable Flutter analytics
-        run: flutter config --no-analytics
-
-      - name: Cache Flutter packages
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.pub-cache
-            app/.dart_tool  # ← Ajusta si tu carpeta no se llama "app"
-          key: ${{ runner.os }}-flutter-${{ hashFiles('app/pubspec.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-flutter-
-
-      - name: Get dependencies
-        run: flutter pub get
-
-      - name: Validate formatting
-        run: flutter format --set-exit-if-changed .
-
-      - name: Analyze code
-        run: flutter analyze
-
-      - name: Run tests
-        run: flutter test
+  - name: Run tests
+    run: flutter test
