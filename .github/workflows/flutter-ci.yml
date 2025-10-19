@@ -33,9 +33,9 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 'stable'
+          flutter-version: '3.13.9'   # ✅ Versión estable real
 
-      - name: Disable Flutter analytics (non-interactive)
+      - name: Disable Flutter analytics
         run: |
           flutter config --no-analytics || true
           flutter --version
@@ -53,10 +53,8 @@ jobs:
 
       - name: Get dependencies (in app-perrona)
         run: |
-          echo "PROJECT_DIR=${PROJECT_DIR}"
           cd "${PROJECT_DIR}"
           echo "PWD: $(pwd)"
-          echo "Listing files here:"
           ls -la
           flutter pub get --verbose
 
